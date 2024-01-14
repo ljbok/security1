@@ -22,11 +22,22 @@ spring:
 #      prefix: /templates/
 #      suffix: .mustache
 
-
-
   jpa:
     hibernate:
       ddl-auto: update #create update none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 865733099012-oke93nd5lkrifnsugsigr19gdcgi8ins.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile

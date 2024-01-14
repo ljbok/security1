@@ -1,11 +1,14 @@
 package com.cos.security1.config.auth;
 
 import com.cos.security1.model.User;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 // 시큐리티가 /login을 주소 요청이 오면 낚아채서 로그인을 진행시킨다.
 // 이때 로그인 진행이 완료가 되면 session을 만들어줍니다. 일반적인 session과 유사한데
@@ -22,14 +25,27 @@ import java.util.Collection;
 // 여기서 PrincipalDetails가 UserDetails를 상속받았기 때문에 UserDetails === PrincipalDetails 라고 보면 된다.
 // 이제 아래서 만든 PrincipalDetails 객체를 Authentication 객체 안에 넣을 수 있다.
 
-// 오버라이드 하자!
-public class PrincipalDetails implements UserDetails {
+// 오버라이드 하자!                        // 일반로그인과 소셜로그인(OAuth) 로그인을 둘 다 사용하기 위해
+@Data                                   // UserDetails와 OAuth2User 을 모두 상속받아 오버라이드하자
+public class PrincipalDetails implements UserDetails, OAuth2User {
 
 
     private User user; // 내가 만들었던 user 객체 => 콤포지션
-
+    private Map<String, Object> attributes; // OAuth2User 받기 위해 추가한 것
+    
+    // 일반 로그인할 때 사용되는 생성자
     public PrincipalDetails(User user) {
         this.user = user;
+    }
+    
+    
+    // OAuth 로그인할때 사용되는 생성자
+    // OAuth2User 받기 위해 추가한 것
+    // OAuth 로그인 시 넘겨받은 사용자의 정보 및 프로필 Map<String, Obejct> attribues 타입으로 넘어오는데
+    //  이를 db에 저장하기 위해 User 타입으로 변환한 후 반환할 것이다.
+    public PrincipalDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
     }
 
     // 해당 유저의 권한을 리턴하는 곳
@@ -93,5 +109,17 @@ public class PrincipalDetails implements UserDetails {
         // 현재시간 - 로그인시간 해서 => 1년을 초과하면 return false;로 하면 된다.
 
         return true; // 응 활성화 되어있어
+    }
+
+    //----- impelemnts OAuth2User 하면서 오버라이드 생긴 메소드 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }

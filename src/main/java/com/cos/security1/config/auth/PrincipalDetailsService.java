@@ -19,6 +19,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    // 함수 종료 시 @AuthenticationPrincipal 어노테이션이 만들어진다.
     @Override  // 여기 파라미터로 있는 username은 로그인 form input type="text" name="username"의 name과 반드시 동일해야한다.
                 // 동일하지 않은 경우 로그인이 정상적으로 이루어지지 않는다.
                 // 만약 form에 있는 name을 username2로 바꾸고 싶다면
@@ -27,7 +28,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User userEntity = userRepository.findByUsername(username); // 이 함수를 사용하려면 UserRepository에 함수를 추가해야 한다.
         if (userEntity != null) { // 위를 통했는데 만약 username으로 조회된 유저가 있다면
-                                // PrincipalDetails(userEntity) 이걸 반화놔는데 이렇게 되면
+                                // PrincipalDetails(userEntity) 이걸 반환하는데 이렇게 되면
                                 // 시큐리티 sesstion에 Authentication(UserDetails)가 자동으로 들어가게 된다.
                                 // Session(Authentication(User)) 꼴 완성
             return new PrincipalDetails(userEntity);
